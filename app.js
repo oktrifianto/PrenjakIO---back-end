@@ -1,6 +1,8 @@
 const express = require('express')
+const mysql   = require('mysql')
 const app     = express()
 const port    = 3000
+require('dotenv').config()
 
 app.get('/', (req, res) => {
   res.json({

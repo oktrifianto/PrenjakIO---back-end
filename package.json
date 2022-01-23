@@ -10,7 +10,9 @@
   "author": "Rahmat",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.2"
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "mysql": "^2.18.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
