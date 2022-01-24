@@ -9,6 +9,17 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/customers', (req, res) => {
+  const x = 'SELECT * FROM customers';
+  db.query(x, (err, result) => {
+    if (err) throw err;
+    res.json({
+      "data"    : result,
+      "status"  : 200
+    });
+  });
+});
+
 app.post('/products', (req, res) => {
   res.json({
     "data" : "Success for POST method"
