@@ -3,6 +3,10 @@ const db      = require('./db/database');
 const app     = express();
 const port    = 3000;
 
+// import from routes
+const UserRoutes = require('./routes/user');
+app.use('/user', UserRoutes);
+
 app.get('/', (req, res) => {
   res.json({
     "data" : "Hello Prenjak IO"
