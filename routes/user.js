@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+router.use(express.json()); // enable request body
 
 /**
  * Method: GET
@@ -31,6 +32,21 @@ router.get('/halo', (req, res) => {
   res.json({
     "data" : "Post method!!"
   })
+});
+
+/**
+ * Sign Up
+ * Method: POST
+ * @url : /user/signup
+ */
+router.post('/signup', (req, res) => {
+  const username      = req.body.username;
+  const email         = req.body.email;
+  const raw_password  = req.body.password;
+  res.json({
+    username,
+    email
+  });
 });
 
 // test function
