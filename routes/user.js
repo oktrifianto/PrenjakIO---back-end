@@ -47,7 +47,7 @@ router.post('/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
   
-    // validate input
+    // Validate input
     if (!(username && email && password)) {
       res.status(400).json({"message": "All input is required."});
     }
@@ -58,20 +58,26 @@ router.post('/signup', async (req, res) => {
     // }
     // CheckUserExist(email); 
 
-    // encrypt password
+    // Encrypt password
     const newPassword = await bcrypt.hash(password, 10);
-    // create token
+    // Create token
     const privateKey  = process.env.TOKEN_KEY;
     const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
 
-    // save to database
-    // ... todo here 
-
-    res.json({
-      username,
-      email,
-      newPassword,
-      token
+    // Save to database
+    const sql = `INSERT INTO user (username, email, password, token) VALUES ('${username}', '${email}', '${newPassword}', '${token}')`;
+    db.query(sql, (err, result) => {
+      if (err) throw err;
+      res.status(200).json({
+        "message": "You have successfully register",
+        "status" : 200,
+        "data" : {
+          "token"   : token,
+          "username": username,
+          "email"   : email,
+          "password": newPassword
+        }
+      });
     });
   } catch (err) {
     console.log(err);
