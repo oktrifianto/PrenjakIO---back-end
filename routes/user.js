@@ -89,10 +89,34 @@ router.post('/signup', async (req, res) => {
  * Method: POST
  * @url /user/login
  */
-router.post('/login', (req, res) => {
-  res.json({
-    "data" : "Hello Login"
-  });
+router.post('/login', async (req, res) => {
+  try {
+    const {email, password} = req.body;
+    
+    // Validate input
+    if (!(email && password)){
+      res.status(400).json({
+        "status": 400,
+        "message": "All input is required"
+      });
+    }
+
+    // Get password from database
+    const ps = await getPasswordUser(email);
+
+    // Compare password
+    if (await bcrypt.compare(password, ps)){
+      res.status(200).json({"message": "Login Success"});
+      return;
+    }
+
+    res.status(400).json({
+      "message": "Invalid Credentials"
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 
@@ -114,6 +138,17 @@ const CheckUserExist = (user_email) => {
     // } else {
     //   console.log(false);
     // }
+  });
+}
+
+// Get password from database
+const getPasswordUser = email => {
+  const sql = `SELECT password FROM user WHERE email="${email}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      resolve(result[0].password);
+    });
   });
 }
 
