@@ -52,33 +52,34 @@ router.post('/signup', async (req, res) => {
       res.status(400).json({"message": "All input is required."});
     }
   
-    // check if email exist *** pending ***
-    // if (CheckUserExist(email) === true){
-    //   res.status(409).json({"message": "Email exist"});
-    // }
-    // CheckUserExist(email); 
-
-    // Encrypt password
-    const newPassword = await bcrypt.hash(password, 10);
-    // Create token
-    const privateKey  = process.env.TOKEN_KEY;
-    const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
-
-    // Save to database
-    const sql = `INSERT INTO user (username, email, password, token) VALUES ('${username}', '${email}', '${newPassword}', '${token}')`;
-    db.query(sql, (err, result) => {
-      if (err) throw err;
-      res.status(200).json({
-        "message": "You have successfully register",
-        "status" : 200,
-        "data" : {
-          "token"   : token,
-          "username": username,
-          "email"   : email,
-          "password": newPassword
-        }
+    // Check if user exist 
+    const UserExist = await checkUserExist(email);
+    if (UserExist){
+      res.status(400).json({"message": "Email exist"});
+    } else {
+      // Encrypt password
+      const newPassword = await bcrypt.hash(password, 10);
+      
+      // Create token
+      const privateKey  = process.env.TOKEN_KEY;
+      const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
+      
+      // Save to database
+      const sql = `INSERT INTO user (username, email, password, token) VALUES ('${username}', '${email}', '${newPassword}', '${token}')`;
+      db.query(sql, (err, result) => {
+        if (err) throw err;
+        res.status(200).json({
+          "message": "You have successfully register",
+          "status" : 200,
+          "data" : {
+            "token"   : token,
+            "username": username,
+            "email"   : email,
+            "password": newPassword
+          }
+        });
       });
-    });
+    }
   } catch (err) {
     console.log(err);
   }
@@ -119,25 +120,22 @@ router.post('/login', async (req, res) => {
   }
 });
 
-
 /**
- * FUNCTIONS
+ * Check If user has been created
+ * @param {*} email 
+ * @returns boolean
  */
-const CheckDataExist = () => true;
-const CheckUserExist = (user_email) => {
-  const queryEmail = `SELECT email FROM user WHERE email="${user_email}"`;
-  // console.log(queryEmail);
-  db.query(queryEmail, (err, result) => {
-    console.log(result[0].email);
-    // if (err) throw err;
-    // console.log(err);
-    // console.log(result[0].email.length);
-    // if (result[0].email.length > 0) {
-    // //   // return true;
-    //   console.log(true);
-    // } else {
-    //   console.log(false);
-    // }
+const checkUserExist = email => {
+  const sql = `SELECT email FROM user WHERE email="${email}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      if (result.length !== 0) { // exist
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
   });
 }
 
