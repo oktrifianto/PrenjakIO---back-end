@@ -107,8 +107,20 @@ router.post('/login', async (req, res) => {
 
     // Compare password
     if (await bcrypt.compare(password, ps)){
-      res.status(200).json({"message": "Login Success"});
-      return;
+      const privateKey  = process.env.TOKEN_KEY;
+      const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
+
+      // Save token to database
+      const sql = `UPDATE user SET token='${token}' WHERE email='${email}'`;
+      db.query(sql, (err, result) => {
+        if (err) throw err;
+        res.status(200).json({
+          "status"  : 200,
+          "message" : "Login Success",
+          "token"   : token
+        });
+      });
+      return; // for next
     }
 
     res.status(400).json({
