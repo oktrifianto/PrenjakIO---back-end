@@ -3,6 +3,7 @@ const router  = express.Router();
 const db      = require('../db/database');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
+const auth    = require("../middleware/auth");
 require('dotenv').config();
 router.use(express.json()); // enable request body
 
@@ -130,6 +131,11 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+});
+
+// Route For Test Auth
+router.get('/welcome', auth, (req, res) => {
+  res.status(200).send("Hi, welcome!");
 });
 
 /**
