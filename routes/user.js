@@ -105,9 +105,11 @@ router.post('/login', async (req, res) => {
 
     // Get password from database
     const ps = await getPasswordUser(email);
+    // Check user exist
+    const UserExist = await checkUserExist(email);
 
     // Compare password
-    if (await bcrypt.compare(password, ps)){
+    if (UserExist && await bcrypt.compare(password, ps)){
       const privateKey  = process.env.TOKEN_KEY;
       const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
 
