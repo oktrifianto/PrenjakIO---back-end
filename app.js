@@ -32,6 +32,17 @@ app.post('/products', (req, res) => {
   });
 });
 
+/**
+ * @description Handling 404 Page
+ * @returns 404
+ */
+app.use("*", (req, res) => {
+  res.status(404).json({
+    "status"  : res.statusCode,
+    "message" : "Page not found"
+  });
+});
+
 app.listen(port, () => {
   console.log(`Application listening on port ${port}`);
 });
