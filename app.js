@@ -4,8 +4,10 @@ const app     = express();
 const port    = 3000;
 
 // import from routes
-const UserRoutes = require('./routes/user');
+const UserRoutes    = require('./routes/user');
+const ProductRoutes = require('./routes/product');
 app.use('/user', UserRoutes);
+app.use('/product', ProductRoutes);
 
 app.get('/', (req, res) => {
   res.json({
