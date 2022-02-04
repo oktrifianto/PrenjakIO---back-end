@@ -5,10 +5,12 @@ const auth    = require('../middleware/auth');
 router.use(express.json());
 
 /**
- * @desc Show all products
- * @method GET
+ * @description   Show all products
+ * @method        GET
+ * @path          /product
+ * @return        all product
+ * @todo          limit query with pagination
  * @public
- * @url /product
  */
 router.get('/', (req, res) => {
   try {
