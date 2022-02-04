@@ -82,6 +82,38 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
+ * @description   Delete Single Product by ID
+ * @method        DELETE 
+ * @path          /product/:id
+ * @protected
+ */
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const id    = req.params.id;
+    if (await checkIDProductExist(id)){
+      const sql = `DELETE FROM product WHERE id="${id}"`;
+      db.query(sql, (err, result) => {
+        if (err) throw err;
+        res.status(202).json({
+          "status"  : res.statusCode,
+          "message" : `Success to deleted product ${id}`
+        })
+      });
+    } else {
+      res.status(404).json({
+        "status"  : res.statusCode,
+        "message" : `Sorry, product id ${id} not exist!`
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+////////////////////////////////////////////////////////////////
+////////////////////       FUNCTIONS        ////////////////////
+////////////////////////////////////////////////////////////////
+/**
  * @description   Get single product
  * @param         {id} 
  * @returns       {id, name, price, image_link, rating, desc, qty}
