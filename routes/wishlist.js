@@ -58,19 +58,26 @@ router.post('/:id_product/add/:id_user', (req, res) => {
     const username  = req.params.username;
     const id_user   = await getIDUser(username);
 
-    // get array of wishlist
-    const arrayWishlist = await getArrayWishlist(id_user); // array => id_wishlist
-    
-    // looping to get wishlist one by one
-    let data = [];
-    for (let i = 0; i < arrayWishlist.length; i++){
-      data.push(await getUserWishlist(arrayWishlist[i]));
+    if (await checkWishlistExist(id_user)){
+      // get array of wishlist
+      const arrayWishlist = await getArrayWishlist(id_user); // array => id_wishlist
+      
+      // looping to get wishlist one by one
+      let data = [];
+      for (let i = 0; i < arrayWishlist.length; i++){
+        data.push(await getUserWishlist(arrayWishlist[i]));
+      }
+
+      res.status(200).json({
+        "status"  : res.statusCode,
+        "data"    : data
+      });
+    } else {
+      res.status(404).json({
+        "status"  : res.statusCode,
+        "message" : "sorry, user don't have wishlist"
+      });
     }
-    
-    res.status(200).json({
-      "status"  : res.statusCode,
-      "data"    : data
-    });
   } catch (err) {
     console.log(err);
   }
@@ -129,6 +136,21 @@ const getUserWishlist = id => {
     db.query(sql, (err, result) => {
       if (err) throw reject(err);
       resolve(result[0]);
+    });
+  });
+}
+
+/**
+ * @description Check Wishlist Existed or Not
+ * @param       {id}
+ * @returns     boolean
+ */
+const checkWishlistExist = id => {
+  const sql = `SELECT * FROM wishlist WHERE id_from_user="${id}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      result.length > 0 ? resolve(true) : resolve(false);
     });
   });
 }
