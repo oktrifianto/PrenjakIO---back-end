@@ -1,5 +1,4 @@
 const express = require('express');
-const db      = require('./db/database');
 const app     = express();
 const port    = 3000;
 
@@ -11,32 +10,24 @@ app.use('/user', UserRoutes);
 app.use('/product', ProductRoutes);
 app.use('/wishlist', WishlistRoutes);
 
+/**
+ * @description   Only main path
+ * @method        GET
+ * @path          [domain.com]/
+ * @returns       Only message
+ */
 app.get('/', (req, res) => {
-  res.json({
-    "data" : "Hello Prenjak IO"
-  });
-});
-
-app.get('/customers', (req, res) => {
-  const x = 'SELECT * FROM customers';
-  db.query(x, (err, result) => {
-    if (err) throw err;
-    res.json({
-      "data"    : result,
-      "status"  : 200
-    });
-  });
-});
-
-app.post('/products', (req, res) => {
-  res.json({
-    "data" : "Success for POST method"
+  res.status(200).json({
+    "status"  : res.sendStatus,
+    "message" : "Welcome to my app"
   });
 });
 
 /**
- * @description Handling 404 Page
- * @returns 404
+ * @description   Handling 404 [Page Not Found]
+ * @method        GET, POST, PUT, DELETE, etc.
+ * @path          *
+ * @returns       404
  */
 app.use("*", (req, res) => {
   res.status(404).json({
