@@ -4,10 +4,12 @@ const app     = express();
 const port    = 3000;
 
 // import from routes
-const UserRoutes    = require('./routes/user');
-const ProductRoutes = require('./routes/product');
+const UserRoutes      = require('./routes/user');
+const ProductRoutes   = require('./routes/product');
+const WishlistRoutes  = require('./routes/wishlist');
 app.use('/user', UserRoutes);
 app.use('/product', ProductRoutes);
+app.use('/wishlist', WishlistRoutes);
 
 app.get('/', (req, res) => {
   res.json({
