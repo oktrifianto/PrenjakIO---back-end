@@ -18,7 +18,7 @@ app.use('/wishlist', WishlistRoutes);
  */
 app.get('/', (req, res) => {
   res.status(200).json({
-    "status"  : res.sendStatus,
+    "status"  : res.statusCode,
     "message" : "Welcome to my app"
   });
 });
