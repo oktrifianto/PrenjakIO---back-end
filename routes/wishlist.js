@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 /**
  * @todo
  * 1. add wislist product (auth) (√)
- * 2. show wishlist from user  
+ * 2. show wishlist from user (√)
  * 3. remove from wishlist (auth)
  * 4. add to cart --- quantities feature
  */
@@ -45,5 +45,92 @@ router.post('/:id_product/add/:id_user', (req, res) => {
     console.log(err);
   }
 });
+
+/**
+ * @description     Show wishlist from single user
+ * @method          GET
+ * @path            /wishlist/:username
+ * @requires        getIDUser(),getArrayWishlist(),getUserWishlist()
+ *                 
+ */
+ router.get('/:username', async (req, res) => {
+  try {
+    const username  = req.params.username;
+    const id_user   = await getIDUser(username);
+
+    // get array of wishlist
+    const arrayWishlist = await getArrayWishlist(id_user); // array => id_wishlist
+    
+    // looping to get wishlist one by one
+    let data = [];
+    for (let i = 0; i < arrayWishlist.length; i++){
+      data.push(await getUserWishlist(arrayWishlist[i]));
+    }
+    
+    res.status(200).json({
+      "status"  : res.statusCode,
+      "data"    : data
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+///////////////////////////////////
+///////// FUNCTIONS ///////////////
+///////////////////////////////////
+/**
+ * @description   Get ID from user using username
+ * @param         {username}
+ * @returns       {id}
+ */
+const getIDUser = username => {
+  const sql   = `SELECT id FROM user WHERE username='${username}'`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      resolve(result[0].id);
+    });
+  });
+}
+
+/**
+ * @description   Get Data Wishlist in Array
+ * @param         {id} 
+ * @returns       {Array}
+ *                [ '1', '2', '4' ]
+ */
+const getArrayWishlist = id => {
+  const sql = `SELECT id_from_product FROM wishlist WHERE id_from_user='${id}'`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      if (result.length > 0) {
+        let arrayWislist = [];
+        for(let i = 0; i < result.length; i++){
+          arrayWislist.push(result[i].id_from_product); // push result to array
+        }
+        resolve(arrayWislist);
+      }
+    });
+  });
+}
+
+/**
+ * @description   Show one of user wishlist
+ * @param         {id} 
+ * @returns       single array
+ *                {id, name, price, rating, etc.}       
+ */
+const getUserWishlist = id => {
+  const sql = `SELECT * FROM product WHERE id="${id}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      resolve(result[0]);
+    });
+  });
+}
 
 module.exports = router;
