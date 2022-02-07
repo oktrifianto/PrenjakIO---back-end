@@ -4,7 +4,7 @@ const db      = require('../db/database');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const auth    = require("../middleware/auth");
-const { checkUserExist, checkUsernameExist, getPasswordUser } = require('../controllers/user.controllers');
+const lib     = require('../controllers/user.controllers');
 require('dotenv').config();
 router.use(express.json()); // enable request body
 
@@ -40,12 +40,12 @@ router.post('/signup', async (req, res) => {
       res.status(400).json({"message": "All input is required."});
     }
   
-    if (await checkUserExist(email)){ // check email
+    if (await lib.checkUserExist(email)){ // check email
       res.status(400).json({
         "status"  : res.statusCode,
         "message" : "Email exist"
       });
-    } else if (await checkUsernameExist(username)) { // check username
+    } else if (await lib.checkUsernameExist(username)) { // check username
       res.status(400).json({
         "status"  : res.statusCode,
         "message": "Username exist"
@@ -97,12 +97,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Get password from database
-    const ps = await getPasswordUser(email);
-    // Check user exist
-    const UserExist = await checkUserExist(email);
+    const ps = await lib.getPasswordUser(email);
 
-    // Compare password
-    if (UserExist && await bcrypt.compare(password, ps)){
+    // Check user is exist && compare password
+    if ( await lib.checkUserExist(email) && await bcrypt.compare(password, ps) ){
       const privateKey  = process.env.TOKEN_KEY;
       const token       = jwt.sign({email}, privateKey, {expiresIn: "2h",});
 
