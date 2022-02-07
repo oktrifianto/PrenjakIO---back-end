@@ -4,6 +4,7 @@ const db      = require('../db/database');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const auth    = require("../middleware/auth");
+const { checkUserExist, getPasswordUser } = require('../controllers/user.controllers');
 require('dotenv').config();
 router.use(express.json()); // enable request body
 
@@ -139,35 +140,5 @@ router.post('/login', async (req, res) => {
 router.get('/welcome', auth, (req, res) => {
   res.status(200).send("Hi, welcome!");
 });
-
-/**
- * Check If user has been created
- * @param {*} email 
- * @returns boolean
- */
-const checkUserExist = email => {
-  const sql = `SELECT email FROM user WHERE email="${email}"`;
-  return new Promise((resolve, reject) => {
-    db.query(sql, (err, result) => {
-      if (err) throw reject(err);
-      if (result.length !== 0) { // exist
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-  });
-}
-
-// Get password from database
-const getPasswordUser = email => {
-  const sql = `SELECT password FROM user WHERE email="${email}"`;
-  return new Promise((resolve, reject) => {
-    db.query(sql, (err, result) => {
-      if (err) throw reject(err);
-      resolve(result[0].password);
-    });
-  });
-}
 
 module.exports = router;
