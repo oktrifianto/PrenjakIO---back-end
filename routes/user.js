@@ -4,7 +4,7 @@ const db      = require('../db/database');
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
 const auth    = require("../middleware/auth");
-const { checkUserExist, getPasswordUser } = require('../controllers/user.controllers');
+const { checkUserExist, checkUsernameExist, getPasswordUser } = require('../controllers/user.controllers');
 require('dotenv').config();
 router.use(express.json()); // enable request body
 
@@ -30,7 +30,6 @@ router.get('/', (req, res) => {
  * @description     Signup using jsonwebtoken
  * @method          POST
  * @path            /user/signup
- * @todo            * check if username exist
  */
 router.post('/signup', async (req, res) => {
   try {
@@ -41,10 +40,16 @@ router.post('/signup', async (req, res) => {
       res.status(400).json({"message": "All input is required."});
     }
   
-    // Check if user exist 
-    const UserExist = await checkUserExist(email);
-    if (UserExist){
-      res.status(400).json({"message": "Email exist"});
+    if (await checkUserExist(email)){ // check email
+      res.status(400).json({
+        "status"  : res.statusCode,
+        "message" : "Email exist"
+      });
+    } else if (await checkUsernameExist(username)) { // check username
+      res.status(400).json({
+        "status"  : res.statusCode,
+        "message": "Username exist"
+      });
     } else {
       // Encrypt password
       const newPassword = await bcrypt.hash(password, 10);
@@ -57,9 +62,9 @@ router.post('/signup', async (req, res) => {
       const sql = `INSERT INTO user (username, email, password, token) VALUES ('${username}', '${email}', '${newPassword}', '${token}')`;
       db.query(sql, (err, result) => {
         if (err) throw err;
-        res.status(200).json({
+        res.status(201).json({
           "message": "You have successfully register",
-          "status" : 200,
+          "status" : res.statusCode,
           "data" : {
             "token"   : token,
             "username": username,
