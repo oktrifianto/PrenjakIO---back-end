@@ -20,6 +20,21 @@ const checkUserExist = email => {
 }
 
 /**
+ * @description   Check username is exist
+ * @param         {username} 
+ * @returns       boolean
+ */
+const checkUsernameExist = username => {
+  const sql = `SELECT username FROM user WHERE username="${username}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      result.length > 0 ? resolve(true) : resolve(false);
+    });
+  });
+}
+
+/**
  * @description Get password user using email
  * @param       {email}
  * @returns     password for validation
@@ -37,5 +52,6 @@ const getPasswordUser = email => {
 // Export functions
 module.exports = {
   checkUserExist,
+  checkUsernameExist,
   getPasswordUser
 }
