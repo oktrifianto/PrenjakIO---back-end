@@ -9,41 +9,28 @@ require('dotenv').config();
 router.use(express.json()); // enable request body
 
 /**
- * Method: GET
- * /user
- * 
+ * @description   Nothing here
+ * @method        GET, POST
+ * @path          /user
+ * @returns       only some message
  */
 router.get('/', (req, res) => {
-  res.json({
-    "data": "From user is success"
+  res.status(200).json({
+    "status"  : res.statusCode,
+    "message" : "Get user, nothing here"
   })
+}).post('/', (req, res) => {
+  res.status(200).json({
+    "status"  : res.statusCode,
+    "message" : "Post user, nothing here!"
+  });
 });
 
 /**
- * Method: GET, POST
- * /user/halo
- * 
- */
-router.get('/halo', (req, res) => {
-  if (CheckDataExist()) {
-    res.json({
-      "data": "Halo from user! True bos"
-    });
-  } else {
-    res.json({
-      "data": "Halo from user! False"
-    });
-  }
-}).post('/halo', (req, res) => {
-  res.json({
-    "data" : "Post method!!"
-  })
-});
-
-/**
- * Sign Up
- * Method: POST
- * @url : /user/signup
+ * @description     Signup using jsonwebtoken
+ * @method          POST
+ * @path            /user/signup
+ * @todo            * check if username exist
  */
 router.post('/signup', async (req, res) => {
   try {
@@ -88,9 +75,9 @@ router.post('/signup', async (req, res) => {
 });
 
 /**
- * Login
- * Method: POST
- * @url /user/login
+ * @description   Login using jsonwebtoken
+ * @method        POST
+ * @path          /user/login
  */
 router.post('/login', async (req, res) => {
   try {
