@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../db/database');
 const auth    = require('../middleware/auth');
+const lib     = require('../controllers/product.controllers');
 router.use(express.json());
 
 /**
@@ -63,9 +64,8 @@ router.post('/new', auth, (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id      = req.params.id;
-    const checkId = await checkIDProductExist(id);
-    if (checkId){
-      const data  = await getSingleProduct(id);
+    if (await lib.checkIDProductExist(id)){
+      const data  = await lib.getSingleProduct(id);
       res.status(200).json({
         "status"  : res.statusCode,
         "data"    : data
@@ -90,7 +90,7 @@ router.get('/:id', async (req, res) => {
 router.delete('/:id', auth, async (req, res) => {
   try {
     const id    = req.params.id;
-    if (await checkIDProductExist(id)){
+    if (await lib.checkIDProductExist(id)){
       const sql = `DELETE FROM product WHERE id="${id}"`;
       db.query(sql, (err, result) => {
         if (err) throw err;
@@ -109,40 +109,5 @@ router.delete('/:id', auth, async (req, res) => {
     console.log(err);
   }
 });
-
-////////////////////////////////////////////////////////////////
-////////////////////       FUNCTIONS        ////////////////////
-////////////////////////////////////////////////////////////////
-/**
- * @description   Get single product
- * @param         {id} 
- * @returns       {id, name, price, image_link, rating, desc, qty}
- */
-const getSingleProduct = id => {
-  const sql = `SELECT * FROM product WHERE id="${id}"`;
-  return new Promise((resolve, reject) => {
-    db.query(sql, (err, result) => {
-      if (err) throw reject(err);
-      resolve(result[0]);
-    });
-  });
-}
-
-/**
- * @description     Check ID Product if exist
- * @returns         boolean (true/false)
- *                  (true)    ID exist
- *                  (false)   ID not exist
- * @param           {id} from product
- */
-const checkIDProductExist = id => {
-  const sql = `SELECT id FROM product WHERE id="${id}"`;
-  return new Promise((resolve, reject) => {
-    db.query(sql, (err, result) => {
-      if (err) throw reject(err);
-      result.length !== 0 ? resolve(true) : resolve(false);
-    });
-  });
-}
 
 module.exports = router;
