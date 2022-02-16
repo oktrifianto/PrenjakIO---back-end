@@ -29,17 +29,17 @@ router.get('/', (req, res) => {
  * @description     Add wishlist product
  * @method          POST
  * @path            /wishlist/:id_product/add/:id_user
- * @todo            show product name     ex. product x is successfully added to wishlist (√)
- *                  handle duplicate wishlist
+ * @todo            (√) show product name     ex. product x is successfully added to wishlist
+ *                  (√) handle duplicate wishlist
  */
 router.post('/:id_product/add/:id_user', async (req, res) => {
   try {
     const { id_product, id_user } = req.params;
     const productName = await lib.getProductName(id_product);
-    if (await lib.checkWishlistByUser(id_user, id_product)) { // wishlist exist
+    if (await lib.checkDuplicateWishlist(id_user, id_product)) { // wishlist exist
       res.status(409).json({
-        "status" : res.statusCode,
-        "message" : "Sorry, your wishlist is already exist."
+        "status"    : res.statusCode,
+        "message"   : "Sorry, your wishlist is already exist."
       });
     } else { 
       const sql = `INSERT INTO wishlist (id_from_product, id_from_user) VALUES ('${id_product}', '${id_user}')`;
@@ -47,7 +47,7 @@ router.post('/:id_product/add/:id_user', async (req, res) => {
         if (err) throw err;
         res.status(201).json({
           "status"    : res.statusCode,
-          "message"   : `success added ${productName} to your wishlist`
+          "message"   : `Success added ${productName} to your wishlist`
         });
       });
     }

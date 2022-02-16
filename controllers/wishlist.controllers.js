@@ -72,7 +72,7 @@ const checkWishlistExist = id => {
  * @param       id_user, id_product
  * @returns     boolean
  */
-const checkWishlistByUser = (id_user, id_product) => {
+const checkDuplicateWishlist = (id_user, id_product) => {
   const sql = `SELECT * FROM wishlist WHERE id_from_user=${id_user} AND id_from_product=${id_product}`;
   return new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
@@ -105,5 +105,5 @@ module.exports = {
   getUserWishlist,
   getProductName,
   checkWishlistExist,
-  checkWishlistByUser
+  checkDuplicateWishlist
 }
