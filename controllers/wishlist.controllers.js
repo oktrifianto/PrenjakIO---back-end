@@ -67,9 +67,27 @@ const checkWishlistExist = id => {
   });
 }
 
+/**
+ * @description   Get product name using ID product
+ * @param         id
+ * @returns       Product Name
+ */
+const getProductName = id => {
+  const sql = `SELECT name FROM product WHERE id="${id}"`;
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) throw reject(err);
+      if (result.length > 0) {
+        resolve(result[0].name);
+      }
+    });
+  });
+}
+
 module.exports = {
   getIDUser,
   getArrayWishlist,
   getUserWishlist,
+  getProductName,
   checkWishlistExist
 }
