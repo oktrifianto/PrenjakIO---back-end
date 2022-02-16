@@ -28,19 +28,20 @@ router.get('/', (req, res) => {
 /**
  * @description     Add wishlist product
  * @method          POST
- * @path            /wishlist/:id_product/create/:id_user
- * @todo            show product name     ex. product x is successfully added to wishlist
+ * @path            /wishlist/:id_product/add/:id_user
+ * @todo            show product name     ex. product x is successfully added to wishlist (√)
  *                  handle duplicate wishlist
  */
-router.post('/:id_product/add/:id_user', (req, res) => {
+router.post('/:id_product/add/:id_user', async (req, res) => {
   try {
     const { id_product, id_user } = req.params;
+    const productName = await lib.getProductName(id_product);
     const sql = `INSERT INTO wishlist (id_from_product, id_from_user) VALUES ('${id_product}', '${id_user}')`;
     db.query(sql, (err, result) => {
       if (err) throw err;
       res.status(201).json({
         "status"    : res.statusCode,
-        "message"   : "success add your product to wishlist"
+        "message"   : `success added ${productName} to your wishlist`
       });
     });
   } catch (err) {
