@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
  * @todo
  * 1. add wislist product (auth) (√)
  * 2. show wishlist from user (√)
- * 3. remove from wishlist (auth)
+ * 3. remove from wishlist (√)
  * 4. add to cart --- quantities feature
  */
 
@@ -90,6 +90,30 @@ router.get('/:username', async (req, res) => {
     }
   } catch (err) {
     console.log(err);
+  }
+});
+
+/**
+ * @description     Remove one wishlist from user
+ * @method          DELETE
+ * @path            /wishlist/:id_product/remove/:id_user
+ */
+router.delete('/:id_product/remove/:id_user', auth, async (req, res) => {
+  const { id_product, id_user } = req.params;
+  if (await lib.checkDuplicateWishlist(id_user, id_product)) { // if exist => then deleted.
+    const sql = `DELETE FROM wishlist WHERE id_from_product=${id_product} AND id_from_user=${id_user}`;
+    db.query(sql, (err, result) => {
+      if (err) throw (err);
+      res.status(202).json({
+        "status"  : res.statusCode,
+        "message" : "your product is sucessfully deleted." 
+      });
+    });
+  } else {
+    res.status(404).json({
+      "status"   : res.statusCode,
+      "message"  : "product not found."
+    })
   }
 });
 
